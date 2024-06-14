@@ -4,5 +4,5 @@
  */
 ?>
 <p <?php echo get_block_wrapper_attributes(); ?>>
-	<?php esc_html_e( 'Block Hooks Navigation After – hello from a dynamic block!', 'block-hooks-navigation-after' ); ?>
+	<?php esc_html_e( '👤', 'block-hooks-navigation-after' ); ?>
 </p>

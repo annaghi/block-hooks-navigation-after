@@ -32,10 +32,7 @@ import './editor.scss';
 export default function Edit() {
 	return (
 		<p { ...useBlockProps() }>
-			{ __(
-				'Block Hooks Navigation After – hello from the editor!',
-				'block-hooks-navigation-after'
-			) }
+			{ __( '👤', 'block-hooks-navigation-after' ) }
 		</p>
 	);
 }
