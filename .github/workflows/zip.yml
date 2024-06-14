@@ -1,0 +1,62 @@
+name: Create and push ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  zip:
+    name: Create and push ZIP
+
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+
+      - name: Compile and bundle Gutenberg assets
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+
+      - name: Set workflow variables
+        run: |
+          PLUGIN_SLUG=${GITHUB_REPOSITORY#*/}
+          echo "PLUGIN_SLUG=$PLUGIN_SLUG" >> $GITHUB_ENV
+
+      - name: Remove existing ZIP
+        run: |
+          if [ -f "${GITHUB_WORKSPACE}/_playground/${PLUGIN_SLUG}.zip" ]; then
+            echo "Existing ZIP found in _playground, deleting..."
+            rm "${GITHUB_WORKSPACE}/_playground/${PLUGIN_SLUG}.zip"
+          fi
+
+      - name: Zip plugin
+        run: |
+          mkdir tmp
+          rsync -rc --filter="merge $GITHUB_WORKSPACE/.distinclude" "$GITHUB_WORKSPACE/" tmp/ --delete --delete-excluded
+          ln -s "$GITHUB_WORKSPACE/tmp" "$GITHUB_WORKSPACE/${PLUGIN_SLUG}"
+          zip -r "$GITHUB_WORKSPACE/_playground/${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG"
+          unlink "$GITHUB_WORKSPACE/${PLUGIN_SLUG}"
+
+      - name: Push zip
+        run: |
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git add --force "_playground/${PLUGIN_SLUG}.zip"
+            git commit -m "Add zip to _playground" --no-verify
+            git push

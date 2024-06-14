@@ -1,0 +1,24 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "Block Hooks Navigation After",
+		"description": "Injecting a block after navigation breaks Editor",
+		"author": "annaghi",
+		"categories": [ "editor", "block-hooks" ]
+	},
+	"landingPage": "/wp-admin/site-editor.php",
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginZipFile": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/annaghi/block-hooks-navigation-after/main/_playground/block-hooks-navigation-after.zip"
+			}
+		},
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		}
+	]
+}
